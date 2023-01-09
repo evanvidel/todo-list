@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import br.com.franco.todolist.databinding.ActivitySplashBinding
+import br.com.franco.todolist.ui.MainActivity
 
 class Splash : AppCompatActivity() {
 
@@ -16,11 +17,11 @@ class Splash : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        supportActionBar?.hide()
+
         window.statusBarColor = Color.parseColor("#000000")
 
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this,MainActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
         }, 2000)

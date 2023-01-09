@@ -13,13 +13,19 @@
         android:theme="@style/Theme.TodoList"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.AddTask"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".Splash"
             android:exported="true">
