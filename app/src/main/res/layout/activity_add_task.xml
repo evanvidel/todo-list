@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.AddTask">
+    tools:context=".ui.AddTaskActivity">
 
     <EditText
-        android:id="@+id/et_tesk"
+        android:id="@+id/et_task"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/esqueva_aqui_a_sua_tarefa"
@@ -27,7 +27,7 @@
         android:text="@string/criar_tarefa"
         android:textAllCaps="false"
         android:backgroundTint="@color/red"
-        app:layout_constraintTop_toBottomOf="@id/et_tesk"
+        app:layout_constraintTop_toBottomOf="@id/et_task"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="32dp"/>
 
