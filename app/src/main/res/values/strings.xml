@@ -4,4 +4,7 @@
     <string name="esqueva_aqui_a_sua_tarefa">Esqueva Aqui a sua Tarefa</string>
     <string name="criar_tarefa">Criar Tarefa</string>
     <string name="lista_de_tarefas">lista de tarefas</string>
+    <string name="delete_tarefa">deletar</string>
+    <string name="editar_tarefa">editar</string>
+    <string name="abrir_menu">abrir menu</string>
 </resources>
