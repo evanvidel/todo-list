@@ -8,6 +8,7 @@ import br.com.franco.todolist.adapter.TaskAdapter
 import br.com.franco.todolist.databinding.ActivityMainBinding
 import br.com.franco.todolist.datasource.TaskDataSource
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -21,15 +22,22 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.parseColor("#FFFFFF")
 
         insertListeners()
-
     }
 
     private fun insertListeners() {
         binding.fab.setOnClickListener {
             startActivityForResult(Intent(this, AddTaskActivity::class.java), CREATE_NEW_TASK)
         }
+
+        adapter.listenerEdit = {
+
+        }
+        adapter.listenerDelete = {
+
+        }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CREATE_NEW_TASK) {
@@ -37,6 +45,7 @@ class MainActivity : AppCompatActivity() {
             adapter.submitList(TaskDataSource.getList())
         }
     }
+
     companion object {
         private const val CREATE_NEW_TASK = 1000
     }
