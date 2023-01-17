@@ -3,6 +3,7 @@ package br.com.franco.todolist.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Paint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View

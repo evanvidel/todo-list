@@ -1,5 +1,6 @@
 package br.com.franco.todolist.adapter
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.PopupMenu
@@ -26,14 +27,24 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
     }
 
     inner class TaskViewHolder(private val  binding: ItemTaskBinding): RecyclerView.ViewHolder(binding.root){
+
         fun bind(item: Task) {
             binding.tvTitle.text = item.title
             binding.tvDate.text = "${item.date} ${item.hour}"
             binding.ivMore.setOnClickListener {
                 showPopup(item)
             }
+            binding.tvTitle.setOnCheckedChangeListener { _, isChecked ->
+                markText(isChecked)
+            }
         }
-
+        private fun markText(mark: Boolean) {
+            if (mark) {
+                binding.tvTitle.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            }else{
+                binding.tvTitle.paintFlags = 0
+            }
+        }
         private fun showPopup(item: Task) {
             val ivMode = binding.ivMore
             val popupMenu = PopupMenu(ivMode.context,ivMode)
