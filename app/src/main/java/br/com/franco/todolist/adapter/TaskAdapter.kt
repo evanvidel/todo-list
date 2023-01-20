@@ -15,6 +15,8 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
 
     var listenerEdit: (Task) -> Unit = {}
     var listenerDelete: (Task) -> Unit = {}
+    var listenerCheck: (Task) -> Unit = {}
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -24,33 +26,41 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         holder.bind(getItem(position))
+
     }
 
-    inner class TaskViewHolder(private val  binding: ItemTaskBinding): RecyclerView.ViewHolder(binding.root){
-
+    inner class TaskViewHolder(private val binding: ItemTaskBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Task) {
-            binding.tvTitle.text = item.title
+            binding.cbTitle.text = item.title
             binding.tvDate.text = "${item.date} ${item.hour}"
             binding.ivMore.setOnClickListener {
                 showPopup(item)
             }
-            binding.tvTitle.setOnCheckedChangeListener { _, isChecked ->
+
+            binding.cbTitle.setOnCheckedChangeListener { _, isChecked ->
+
                 markText(isChecked)
+                if (isChecked) {
+                    listenerCheck.invoke(item)
+                }
             }
         }
+
         private fun markText(mark: Boolean) {
             if (mark) {
-                binding.tvTitle.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
-            }else{
-                binding.tvTitle.paintFlags = 0
+                binding.cbTitle.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
+            } else {
+                binding.cbTitle.paintFlags = 0
             }
         }
+
         private fun showPopup(item: Task) {
             val ivMode = binding.ivMore
-            val popupMenu = PopupMenu(ivMode.context,ivMode)
+            val popupMenu = PopupMenu(ivMode.context, ivMode)
             popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener {
-                when(it.itemId){
+                when (it.itemId) {
                     R.id.action_edit -> listenerEdit(item)
                     R.id.action_delete -> listenerDelete(item)
                 }

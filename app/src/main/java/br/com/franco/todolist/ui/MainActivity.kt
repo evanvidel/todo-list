@@ -3,13 +3,13 @@ package br.com.franco.todolist.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Paint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import br.com.franco.todolist.adapter.TaskAdapter
 import br.com.franco.todolist.databinding.ActivityMainBinding
 import br.com.franco.todolist.datasource.TaskDataSource
+import br.com.franco.todolist.model.Task
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         window.statusBarColor = Color.parseColor("#FFFFFF")
 
+
         binding.rvTasks.adapter = adapter
         updateList()
         insertListeners()
@@ -35,26 +36,37 @@ class MainActivity : AppCompatActivity() {
 
         adapter.listenerEdit = {
             val intent = Intent(this, AddTaskActivity::class.java)
-            intent.putExtra(AddTaskActivity.TASK_ID,it.id)
+            intent.putExtra(AddTaskActivity.TASK_ID, it.id)
             startActivityForResult(intent, CREATE_NEW_TASK)
         }
         adapter.listenerDelete = {
             TaskDataSource.deleteTask(it)
             updateList()
         }
+        adapter.listenerCheck =  {
+            TaskDataSource.deleteTask(it)
+            TaskDataSource.insertTask(it)
+            adapter.submitList(TaskDataSource.getList())
+        }
     }
 
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CREATE_NEW_TASK && resultCode == Activity.RESULT_OK)updateList()
+        if (requestCode == CREATE_NEW_TASK && resultCode == Activity.RESULT_OK) updateList()
 
     }
 
     private fun updateList() {
+        TaskDataSource.apply {
+            insertTask(Task("Tarefa 1"))
+            insertTask(Task("Tarefa 2"))
+            insertTask(Task("Tarefa 3"))
+            insertTask(Task("Tarefa 4"))
+        }
         val list = TaskDataSource.getList()
         binding.includeEmpty.emptyState.visibility =
-            if(list.isEmpty()) View.VISIBLE else View.GONE
+            if (list.isEmpty()) View.VISIBLE else View.GONE
         adapter.submitList(list)
     }
 

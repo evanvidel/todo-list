@@ -10,11 +10,9 @@ import br.com.franco.todolist.extensions.format
 import br.com.franco.todolist.extensions.text
 import br.com.franco.todolist.model.Task
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import java.util.Date
-import java.util.TimeZone
+import java.util.*
 
 class AddTaskActivity : AppCompatActivity() {
 
@@ -28,7 +26,7 @@ class AddTaskActivity : AppCompatActivity() {
         window.statusBarColor = Color.parseColor("#000000")
 
         if (intent.hasExtra(TASK_ID)) {
-            val taskId = intent.getIntExtra(TASK_ID,0)
+            val taskId = intent.getIntExtra(TASK_ID, 0)
             TaskDataSource.findById(taskId)?.let {
                 binding.tilTitle.text = it.title
                 binding.tilDate.text = it.date
@@ -54,12 +52,13 @@ class AddTaskActivity : AppCompatActivity() {
                 .setTimeFormat(TimeFormat.CLOCK_24H)
                 .build()
             timePicker.addOnPositiveButtonClickListener {
-                val minute = if (timePicker.minute in 0..9) "0${timePicker.minute}" else timePicker.minute
+                val minute =
+                    if (timePicker.minute in 0..9) "0${timePicker.minute}" else timePicker.minute
                 val hour = if (timePicker.hour in 0..9) "0${timePicker.hour}" else timePicker.hour
 
                 binding.tilHour.text = "$hour:$minute"
             }
-            timePicker.show(supportFragmentManager,null)
+            timePicker.show(supportFragmentManager, null)
         }
 
         binding.btnCancel.setOnClickListener {
@@ -67,18 +66,28 @@ class AddTaskActivity : AppCompatActivity() {
         }
 
         binding.btnNewTask.setOnClickListener {
+
             val task = Task(
                 title = binding.tilTitle.text,
                 date = binding.tilDate.text,
                 hour = binding.tilHour.text,
                 id = intent.getIntExtra(TASK_ID, 0)
             )
+
             TaskDataSource.insertTask(task)
             setResult(Activity.RESULT_OK)
             finish()
         }
     }
+
     companion object {
         const val TASK_ID = "task_id"
     }
 }
+/*private fun salvar() {
+        val titulo = binding.cbTitle.text
+        if (titulo.isEmpty()) {
+            PreferencesUser(this).saveString("TITULO", titulo)
+            PreferencesUser(this).getString("TITULO")
+        }
+    }*/
