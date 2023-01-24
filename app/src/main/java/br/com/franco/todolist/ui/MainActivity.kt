@@ -11,6 +11,7 @@ import br.com.franco.todolist.databinding.ActivityMainBinding
 import br.com.franco.todolist.datasource.TaskDataSource
 import br.com.franco.todolist.model.Task
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
