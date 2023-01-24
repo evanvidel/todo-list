@@ -43,9 +43,14 @@ class MainActivity : AppCompatActivity() {
             TaskDataSource.deleteTask(it)
             updateList()
         }
-        adapter.listenerCheck =  {
-            TaskDataSource.deleteTask(it)
-            TaskDataSource.insertTask(it)
+
+        adapter.listenerCheck = { isCheck, task ->
+
+            if (isCheck) {
+                TaskDataSource.insertTask(task)
+            } else {
+                TaskDataSource.insertTaskTop(task)
+            }
             adapter.submitList(TaskDataSource.getList())
         }
     }

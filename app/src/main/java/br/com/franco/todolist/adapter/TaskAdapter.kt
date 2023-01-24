@@ -9,13 +9,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import br.com.franco.todolist.R
 import br.com.franco.todolist.databinding.ItemTaskBinding
+import br.com.franco.todolist.datasource.TaskDataSource
+import br.com.franco.todolist.datasource.TaskDataSource.deleteTask
+import br.com.franco.todolist.datasource.TaskDataSource.insertTask
 import br.com.franco.todolist.model.Task
 
 class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()) {
 
     var listenerEdit: (Task) -> Unit = {}
     var listenerDelete: (Task) -> Unit = {}
-    var listenerCheck: (Task) -> Unit = {}
+    var listenerCheck: (isCheck: Boolean,Task) -> Unit = {_, _ ->}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -41,13 +44,13 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
             binding.cbTitle.setOnCheckedChangeListener { _, isChecked ->
 
                 markText(isChecked)
-                if (isChecked) {
-                    listenerCheck.invoke(item)
-                }
+                listenerCheck.invoke(isChecked,item)
             }
         }
 
+
         private fun markText(mark: Boolean) {
+
             if (mark) {
                 binding.cbTitle.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
             } else {
