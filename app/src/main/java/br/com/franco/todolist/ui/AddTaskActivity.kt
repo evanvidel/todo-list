@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.franco.todolist.databinding.ActivityAddTaskBinding
+import br.com.franco.todolist.datasource.FirebaseHelper
 import br.com.franco.todolist.datasource.TaskDataSource
 import br.com.franco.todolist.extensions.format
 import br.com.franco.todolist.extensions.text
@@ -12,11 +13,13 @@ import br.com.franco.todolist.model.Task
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 class AddTaskActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTaskBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +31,12 @@ class AddTaskActivity : AppCompatActivity() {
         if (intent.hasExtra(TASK_ID)) {
             val taskId = intent.getIntExtra(TASK_ID, 0)
             TaskDataSource.findById(taskId)?.let {
-                binding.tilTitle.text = it.title
-                binding.tilDate.text = it.date
-                binding.tilHour.text = it.hour
+                with(binding) {
+                    tilTitle.text = it.title
+                    tilDate.text = it.date
+                    tilHour.text = it.hour
+                }
+
             }
         }
 
@@ -84,10 +90,4 @@ class AddTaskActivity : AppCompatActivity() {
         const val TASK_ID = "task_id"
     }
 }
-/*private fun salvar() {
-        val titulo = binding.cbTitle.text
-        if (titulo.isEmpty()) {
-            PreferencesUser(this).saveString("TITULO", titulo)
-            PreferencesUser(this).getString("TITULO")
-        }
-    }*/
+

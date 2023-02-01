@@ -1,24 +1,22 @@
 package br.com.franco.todolist.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import br.com.franco.todolist.R
 import br.com.franco.todolist.databinding.ItemTaskBinding
-import br.com.franco.todolist.datasource.TaskDataSource
-import br.com.franco.todolist.datasource.TaskDataSource.deleteTask
-import br.com.franco.todolist.datasource.TaskDataSource.insertTask
 import br.com.franco.todolist.model.Task
+import com.google.firebase.firestore.FirebaseFirestore
 
 class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()) {
 
     var listenerEdit: (Task) -> Unit = {}
     var listenerDelete: (Task) -> Unit = {}
-    var listenerCheck: (isCheck: Boolean,Task) -> Unit = {_, _ ->}
+    var listenerCheck: (isCheck: Boolean, Task) -> Unit = { _, _ -> }
+
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -34,20 +32,24 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
 
     inner class TaskViewHolder(private val binding: ItemTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(item: Task) {
             binding.cbTitle.text = item.title
             binding.tvDate.text = "${item.date} ${item.hour}"
-            binding.ivMore.setOnClickListener {
-                showPopup(item)
+
+            binding.ivEdit.setOnClickListener {
+                listenerEdit(item)
+            }
+            binding.ivDelete.setOnClickListener {
+                listenerDelete(item)
             }
 
             binding.cbTitle.setOnCheckedChangeListener { _, isChecked ->
 
                 markText(isChecked)
-                listenerCheck.invoke(isChecked,item)
+                listenerCheck.invoke(isChecked, item)
             }
         }
-
 
         private fun markText(mark: Boolean) {
 
@@ -56,20 +58,6 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
             } else {
                 binding.cbTitle.paintFlags = 0
             }
-        }
-
-        private fun showPopup(item: Task) {
-            val ivMode = binding.ivMore
-            val popupMenu = PopupMenu(ivMode.context, ivMode)
-            popupMenu.menuInflater.inflate(R.menu.popup_menu, popupMenu.menu)
-            popupMenu.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.action_edit -> listenerEdit(item)
-                    R.id.action_delete -> listenerDelete(item)
-                }
-                return@setOnMenuItemClickListener true
-            }
-            popupMenu.show()
         }
     }
 }
