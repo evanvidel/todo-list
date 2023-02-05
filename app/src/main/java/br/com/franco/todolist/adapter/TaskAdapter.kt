@@ -2,6 +2,7 @@ package br.com.franco.todolist.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -42,6 +43,8 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
             }
             binding.ivDelete.setOnClickListener {
                 listenerDelete(item)
+
+
             }
 
             binding.cbTitle.setOnCheckedChangeListener { _, isChecked ->

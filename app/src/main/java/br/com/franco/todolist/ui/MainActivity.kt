@@ -4,18 +4,17 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import br.com.franco.todolist.adapter.TaskAdapter
 import br.com.franco.todolist.databinding.ActivityMainBinding
 import br.com.franco.todolist.datasource.FirebaseHelper
-import br.com.franco.todolist.datasource.TaskDataSource
-import br.com.franco.todolist.model.Task
+import br.com.franco.todolist.ui.AddTaskActivity.Companion.TASK_ID
 
 
 class MainActivity : AppCompatActivity() {
-    private val firebaseHelper = FirebaseHelper()
 
     private lateinit var binding: ActivityMainBinding
     private val adapter by lazy { TaskAdapter() }
@@ -31,12 +30,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
-        binding.btnTeste.setOnClickListener {
-            createDocument()
-        }
-
         window.statusBarColor = Color.parseColor("#FFFFFF")
 
         binding.rvTasks.adapter = adapter
@@ -44,12 +37,6 @@ class MainActivity : AppCompatActivity() {
         insertListeners()
     }
 
-    fun createDocument() {
-        val task = Task(
-            title = "task 1", id = 6
-        )
-        firebaseHelper.create(task)
-    }
 
     private fun insertListeners() {
         binding.fab.setOnClickListener {
@@ -58,28 +45,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         adapter.listenerEdit = {
+
             val intent = Intent(this, AddTaskActivity::class.java)
-            intent.putExtra(AddTaskActivity.TASK_ID, it.id)
+            intent.putExtra(TASK_ID, it)
             resultLauncher.launch(intent)
+
         }
         adapter.listenerDelete = {
-            TaskDataSource.deleteTask(it)
+            FirebaseHelper.delete(it)
+
             updateList()
         }
-
         adapter.listenerCheck = { isCheck, task ->
-
-//            if (isCheck) {
-//                TaskDataSource.insertTask(task)
-//            } else {
-//                TaskDataSource.insertTaskTop(task)
-//            }
-//            adapter.submitList(TaskDataSource.getList())
+            /*  if (isCheck) {
+                  TaskDataSource.insertTask(task)
+              } else {
+                  TaskDataSource.insertTaskTop(task)
+              }
+              adapter.submitList(TaskDataSource.getList())*/
         }
     }
 
     private fun updateList() {
-        firebaseHelper.read {
+        FirebaseHelper.read {
             if (it.isEmpty()) {
                 binding.includeEmpty.emptyState.visibility = View.VISIBLE
             } else {

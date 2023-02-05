@@ -3,19 +3,20 @@ package br.com.franco.todolist.datasource
 import android.util.Log
 import br.com.franco.todolist.model.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
+import io.grpc.InternalChannelz.id
 
-class FirebaseHelper {
+object FirebaseHelper {
 
-    private val db = FirebaseFirestore.getInstance()
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
     fun create(item: Task) {
         db.collection(COLLECTION_NAME).add(item)
-        Log.i("TAG", "create: $item")
     }
 
     fun read(onSuccess: (list: List<Task?>) -> Unit) {
-        db.collection(COLLECTION_NAME).get().addOnSuccessListener { querySnapshot ->
+        db.collection(COLLECTION_NAME).get().addOnSuccessListener { querySnapshot: QuerySnapshot ->
             val list = querySnapshot.documents.map { it.toObject(Task::class.java) }
             onSuccess(list)
         }.addOnFailureListener {
@@ -28,37 +29,56 @@ class FirebaseHelper {
     //      firebaseHelper.update(it, task)
     //  }
 
-    fun update(id: String, task: Task) {
-        db.collection(COLLECTION_NAME).document(id).set(task, SetOptions.merge())
+    fun update(reference: String, task: Task, onSuccess: () -> Unit) {
+        db.collection(COLLECTION_NAME).document(reference).set(task, SetOptions.merge())
             .addOnSuccessListener {
-
+                onSuccess()
             }.addOnFailureListener {
 
             }
     }
 
     // não mexer
-    fun getDocumentByTitle(title: String, onSuccess: (String) -> Unit) {
+    fun getDocumentById(id: Int, onSuccess: (String) -> Unit) {
         db.collection(COLLECTION_NAME)
-            .whereEqualTo("title", title)
+            .whereEqualTo("id", id)
             .get()
             .addOnSuccessListener {
                 onSuccess.invoke(it.documents[0].id)
             }
     }
 
-    fun delete(document: String) {
-        db.collection(COLLECTION_NAME).document(document).delete()
-            .addOnSuccessListener {
 
-            }.addOnFailureListener {
 
+    fun filter(onSuccess: (list: List<Task?>) -> Unit) {
+        db.collection(COLLECTION_NAME)
+            .whereEqualTo("checked", false)
+            .whereEqualTo("hour", "")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                val list = querySnapshot.documents.map { it.toObject(Task::class.java) }
+                onSuccess(list)
             }
     }
 
-    companion object {
-        const val COLLECTION_NAME = "Tarefas"
+    fun delete(task: Task) {
+        db.collection(COLLECTION_NAME).document()
+            .delete()
+
+        Log.i("TAG", "delete: itens $task")
+        /*db.collection(COLLECTION_NAME).document("tarefa13")
+            .delete()
+        Log.i("TAG", "firebese fun delete: $task")
+           // .delete()
+          //  .addOnSuccessListener {
+
+         //   }.addOnFailureListener {
+
+         //   }*/
     }
+
+    private const val COLLECTION_NAME = "Tarefas"
+
 }
 
 

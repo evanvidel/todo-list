@@ -6,14 +6,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import br.com.franco.todolist.databinding.ActivityAddTaskBinding
 import br.com.franco.todolist.datasource.FirebaseHelper
-import br.com.franco.todolist.datasource.TaskDataSource
 import br.com.franco.todolist.extensions.format
 import br.com.franco.todolist.extensions.text
 import br.com.franco.todolist.model.Task
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
 
 class AddTaskActivity : AppCompatActivity() {
@@ -29,15 +27,13 @@ class AddTaskActivity : AppCompatActivity() {
         window.statusBarColor = Color.parseColor("#000000")
 
         if (intent.hasExtra(TASK_ID)) {
-            val taskId = intent.getIntExtra(TASK_ID, 0)
-            TaskDataSource.findById(taskId)?.let {
-                with(binding) {
-                    tilTitle.text = it.title
-                    tilDate.text = it.date
-                    tilHour.text = it.hour
-                }
-
+            val task: Task? = intent.getParcelableExtra(TASK_ID)
+            task?.let {
+                binding.tilTitle.text = it.title
+                binding.tilDate.text = it.date
+                binding.tilHour.text = it.hour
             }
+
         }
 
         insertListeners()
@@ -73,16 +69,36 @@ class AddTaskActivity : AppCompatActivity() {
 
         binding.btnNewTask.setOnClickListener {
 
-            val task = Task(
-                title = binding.tilTitle.text,
-                date = binding.tilDate.text,
-                hour = binding.tilHour.text,
-                id = intent.getIntExtra(TASK_ID, 0)
-            )
+            if (intent.hasExtra(TASK_ID)) {
+                val task: Task? = intent.getParcelableExtra(TASK_ID)
+                task?.let {
+                    task.title = binding.tilTitle.text
+                    task.date = binding.tilDate.text
+                    task.hour = binding.tilHour.text
 
-            TaskDataSource.insertTask(task)
-            setResult(Activity.RESULT_OK)
-            finish()
+                    FirebaseHelper.getDocumentById(task.id) { reference ->
+                        FirebaseHelper.update(reference, it) {
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                    }
+
+                }
+
+            } else {
+                // TaskDataSource.insertTask(task)
+                val task = Task(
+                    title = binding.tilTitle.text,
+                    date = binding.tilDate.text,
+                    hour = binding.tilHour.text,
+                    id = Random().nextInt()
+                )
+                FirebaseHelper.create(task)
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+
+
         }
     }
 
