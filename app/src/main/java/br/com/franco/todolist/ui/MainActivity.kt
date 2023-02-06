@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
         insertListeners()
     }
 
-
     private fun insertListeners() {
         binding.fab.setOnClickListener {
             val intent = Intent(this, AddTaskActivity::class.java)
@@ -52,17 +51,23 @@ class MainActivity : AppCompatActivity() {
 
         }
         adapter.listenerDelete = {
-            FirebaseHelper.delete(it)
 
-            updateList()
+            FirebaseHelper.getDocumentById(it.id) { path ->
+                FirebaseHelper.delete(path)
+                updateList()
+            }
         }
         adapter.listenerCheck = { isCheck, task ->
-            /*  if (isCheck) {
-                  TaskDataSource.insertTask(task)
-              } else {
-                  TaskDataSource.insertTaskTop(task)
-              }
-              adapter.submitList(TaskDataSource.getList())*/
+            Log.i("TAG1", "insertListeners: $task")
+            task.isChecked = isCheck
+
+            FirebaseHelper.getDocumentById(task.id) { doc ->
+                FirebaseHelper.update(doc, task) {
+                    updateList()
+                }
+            }
+
+            Log.i("TAG1", "insertListeners: $task")
         }
     }
 
@@ -75,6 +80,5 @@ class MainActivity : AppCompatActivity() {
                 adapter.submitList(it)
             }
         }
-        //firebaseHelper.getDocumentByTitle()
     }
 }

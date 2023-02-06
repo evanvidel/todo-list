@@ -3,6 +3,7 @@ package br.com.franco.todolist.model
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
+@Suppress("DEPRECATED_ANNOTATION")
 @Parcelize
 data class Task(
     var title: String = "",

@@ -33,7 +33,6 @@ class AddTaskActivity : AppCompatActivity() {
                 binding.tilDate.text = it.date
                 binding.tilHour.text = it.hour
             }
-
         }
 
         insertListeners()
@@ -82,7 +81,6 @@ class AddTaskActivity : AppCompatActivity() {
                             finish()
                         }
                     }
-
                 }
 
             } else {
@@ -97,8 +95,6 @@ class AddTaskActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK)
                 finish()
             }
-
-
         }
     }
 
