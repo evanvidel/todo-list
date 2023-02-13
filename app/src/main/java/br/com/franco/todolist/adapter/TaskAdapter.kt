@@ -36,10 +36,10 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
             binding.cbTitle.text = item.title
             binding.tvDate.text = "${item.date} ${item.hour}"
             binding.cbTitle.isChecked = item.isChecked
-            Log.i("TAG2", "binding")
-            Log.i("TAG2", "marcar texto")
+
             markText(item.isChecked)
             binding.ivEdit.setOnClickListener {
+
                 listenerEdit(item)
             }
             binding.ivDelete.setOnClickListener {
@@ -49,6 +49,7 @@ class TaskAdapter : ListAdapter<Task, TaskAdapter.TaskViewHolder>(DiffCallBack()
             binding.cbTitle.setOnCheckedChangeListener { _, isChecked ->
                 //markText(isChecked)
                 listenerCheck.invoke(isChecked, item)
+
             }
         }
 

@@ -1,9 +1,12 @@
 package br.com.franco.todolist.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import br.com.franco.todolist.R
 import br.com.franco.todolist.databinding.ActivityAddTaskBinding
 import br.com.franco.todolist.datasource.FirebaseHelper
 import br.com.franco.todolist.extensions.format
@@ -18,13 +21,21 @@ class AddTaskActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTaskBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val dados = intent.extras
+        val titulo = dados?.getString("titulo")
+        val botao = dados?.getString("botao")
+        binding.toolbar.title = titulo
+        binding.btnNewTask.text = (botao)
+
         window.statusBarColor = Color.parseColor("#000000")
+        binding.toolbar.setNavigationOnClickListener {
+            startActivity(Intent(this,MainActivity::class.java))
+        }
 
         if (intent.hasExtra(TASK_ID)) {
             val task: Task? = intent.getParcelableExtra(TASK_ID)
@@ -67,7 +78,6 @@ class AddTaskActivity : AppCompatActivity() {
         }
 
         binding.btnNewTask.setOnClickListener {
-
             if (intent.hasExtra(TASK_ID)) {
                 val task: Task? = intent.getParcelableExtra(TASK_ID)
                 task?.let {
@@ -84,7 +94,6 @@ class AddTaskActivity : AppCompatActivity() {
                 }
 
             } else {
-                // TaskDataSource.insertTask(task)
                 val task = Task(
                     title = binding.tilTitle.text,
                     date = binding.tilDate.text,
