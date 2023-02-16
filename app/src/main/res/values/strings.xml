@@ -7,5 +7,6 @@
     <string name="delete_tarefa">deletar</string>
     <string name="editar_tarefa">editar</string>
     <string name="abrir_menu">abrir menu</string>
-    <string name="label_sem_tarefa">Você não possue nenhuma tarefa!</string>
+    <string name="label_sem_tarefa">Ops! Você não possue nenhuma tarefa!</string>
+    <string name="date">01/01/2023 18:00</string>
 </resources>

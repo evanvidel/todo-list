@@ -1,11 +1,14 @@
 package br.com.franco.todolist.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import br.com.franco.todolist.R
 import br.com.franco.todolist.databinding.ActivityAddTaskBinding
-import br.com.franco.todolist.datasource.TaskDataSource
+import br.com.franco.todolist.datasource.FirebaseHelper
 import br.com.franco.todolist.extensions.format
 import br.com.franco.todolist.extensions.text
 import br.com.franco.todolist.model.Task
@@ -23,11 +26,20 @@ class AddTaskActivity : AppCompatActivity() {
         binding = ActivityAddTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val dados = intent.extras
+        val titulo = dados?.getString("titulo")
+        val botao = dados?.getString("botao")
+        binding.toolbar.title = titulo
+        binding.btnNewTask.text = (botao)
+
         window.statusBarColor = Color.parseColor("#000000")
+        binding.toolbar.setNavigationOnClickListener {
+            startActivity(Intent(this,MainActivity::class.java))
+        }
 
         if (intent.hasExtra(TASK_ID)) {
-            val taskId = intent.getIntExtra(TASK_ID, 0)
-            TaskDataSource.findById(taskId)?.let {
+            val task: Task? = intent.getParcelableExtra(TASK_ID)
+            task?.let {
                 binding.tilTitle.text = it.title
                 binding.tilDate.text = it.date
                 binding.tilHour.text = it.hour
@@ -66,17 +78,32 @@ class AddTaskActivity : AppCompatActivity() {
         }
 
         binding.btnNewTask.setOnClickListener {
+            if (intent.hasExtra(TASK_ID)) {
+                val task: Task? = intent.getParcelableExtra(TASK_ID)
+                task?.let {
+                    task.title = binding.tilTitle.text
+                    task.date = binding.tilDate.text
+                    task.hour = binding.tilHour.text
 
-            val task = Task(
-                title = binding.tilTitle.text,
-                date = binding.tilDate.text,
-                hour = binding.tilHour.text,
-                id = intent.getIntExtra(TASK_ID, 0)
-            )
+                    FirebaseHelper.getDocumentById(task.id) { reference ->
+                        FirebaseHelper.update(reference, it) {
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        }
+                    }
+                }
 
-            TaskDataSource.insertTask(task)
-            setResult(Activity.RESULT_OK)
-            finish()
+            } else {
+                val task = Task(
+                    title = binding.tilTitle.text,
+                    date = binding.tilDate.text,
+                    hour = binding.tilHour.text,
+                    id = Random().nextInt()
+                )
+                FirebaseHelper.create(task)
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
         }
     }
 
@@ -84,10 +111,4 @@ class AddTaskActivity : AppCompatActivity() {
         const val TASK_ID = "task_id"
     }
 }
-/*private fun salvar() {
-        val titulo = binding.cbTitle.text
-        if (titulo.isEmpty()) {
-            PreferencesUser(this).saveString("TITULO", titulo)
-            PreferencesUser(this).getString("TITULO")
-        }
-    }*/
+
