@@ -4,18 +4,30 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import br.com.franco.todolist.adapter.TaskAdapter
+import br.com.franco.todolist.databinding.ActivityAddTaskBinding
 import br.com.franco.todolist.databinding.ActivityMainBinding
-import br.com.franco.todolist.datasource.TaskDataSource
-import br.com.franco.todolist.model.Task
+import br.com.franco.todolist.datasource.FirebaseHelper
+import br.com.franco.todolist.ui.AddTaskActivity.Companion.TASK_ID
 
-@Suppress("DEPRECATION")
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val adapter by lazy { TaskAdapter() }
+
+    var resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+
+                updateList()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,8 +35,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         window.statusBarColor = Color.parseColor("#FFFFFF")
-
-
         binding.rvTasks.adapter = adapter
         updateList()
         insertListeners()
@@ -32,51 +42,46 @@ class MainActivity : AppCompatActivity() {
 
     private fun insertListeners() {
         binding.fab.setOnClickListener {
-            startActivityForResult(Intent(this, AddTaskActivity::class.java), CREATE_NEW_TASK)
+            val intent = Intent(this, AddTaskActivity::class.java)
+            intent.putExtra("titulo","Criar Tarefa")
+            intent.putExtra("botao", "Criar Tarefa")
+
+
+            resultLauncher.launch(intent)
         }
 
         adapter.listenerEdit = {
             val intent = Intent(this, AddTaskActivity::class.java)
-            intent.putExtra(AddTaskActivity.TASK_ID, it.id)
-            startActivityForResult(intent, CREATE_NEW_TASK)
+            intent.putExtra("titulo","Editar Tarefa")
+            intent.putExtra("botao", "Editar Tarefa")
+            intent.putExtra(TASK_ID, it)
+            resultLauncher.launch(intent)
+
         }
         adapter.listenerDelete = {
-            TaskDataSource.deleteTask(it)
-            updateList()
-        }
-
-        adapter.listenerCheck = { isCheck, task ->
-
-            if (isCheck) {
-                TaskDataSource.insertTask(task)
-            } else {
-                TaskDataSource.insertTaskTop(task)
+            FirebaseHelper.getDocumentById(it.id) { path ->
+                FirebaseHelper.delete(path)
+                updateList()
             }
-            adapter.submitList(TaskDataSource.getList())
         }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CREATE_NEW_TASK && resultCode == Activity.RESULT_OK) updateList()
-
+        adapter.listenerCheck = { isCheck, task ->
+            task.isChecked = isCheck
+            FirebaseHelper.getDocumentById(task.id) { doc ->
+                FirebaseHelper.update(doc, task) {
+                    updateList()
+                }
+            }
+        }
     }
 
     private fun updateList() {
-        TaskDataSource.apply {
-            insertTask(Task("Tarefa 1"))
-            insertTask(Task("Tarefa 2"))
-            insertTask(Task("Tarefa 3"))
-            insertTask(Task("Tarefa 4"))
+        FirebaseHelper.read {
+            if (it.isEmpty()) {
+                binding.includeEmpty.emptyState.visibility = View.VISIBLE
+            } else {
+                binding.includeEmpty.emptyState.visibility = View.GONE
+                adapter.submitList(it)
+            }
         }
-        val list = TaskDataSource.getList()
-        binding.includeEmpty.emptyState.visibility =
-            if (list.isEmpty()) View.VISIBLE else View.GONE
-        adapter.submitList(list)
-    }
-
-    companion object {
-        private const val CREATE_NEW_TASK = 1000
     }
 }
